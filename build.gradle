@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'com.imlehr'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+
+    //lombok
+    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.2'
+    testCompileOnly 'org.projectlombok:lombok:1.18.2'
+    implementation 'junit:junit:4.12'
+    implementation 'org.testng:testng:6.9.6'
+
+}
