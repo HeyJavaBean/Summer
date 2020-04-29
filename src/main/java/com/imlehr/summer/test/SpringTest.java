@@ -18,7 +18,6 @@ public class SpringTest{
 
         System.out.println(ac.getBean("lehr"));
 
-
         System.out.println(ac.getBean("lehr"));
 
         System.out.println(ac.getBean("Bruce"));

@@ -1,7 +1,9 @@
 package com.imlehr.summer.beans.factory;
 
-import com.imlehr.summer.annotation.Bean;
+import com.imlehr.summer.annotation.*;
 import com.imlehr.summer.beans.BeanDefinition;
+import com.imlehr.summer.beans.BeanDefinitionHolder;
+import com.imlehr.summer.context.BeanDefinitionRegistry;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
@@ -21,65 +23,117 @@ public class BeanFactory {
      */
     private Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
-    private String configName;
+    private final BeanDefinitionRegistry registry;
 
-    public void registerBeanDefinition(BeanDefinition bean) {
-        configName = bean.getBeanName();
-        beanDefinitionMap.put(bean.getBeanName(), bean);
+    public BeanFactory(BeanDefinitionRegistry registry) {
+        this.registry = registry;
+        //这里还需要注册一些processor但是我懒得写了
+    }
+
+    public void registerBeanDefinition(BeanDefinitionHolder bdh) {
+        beanDefinitionMap.put(bdh.getBeanName(), bdh.getBeanDefinition());
     }
 
 
-    public void preInstantiateSingletons()
-    {
+    public void preInstantiateSingletons() {
         //挨个实例化
-        beanDefinitionMap.forEach((name,beanDefinition)->
+        beanDefinitionMap.forEach((name, beanDefinition) ->
         {
-            if(beanDefinition.isSingleton() && beanDefinition.notLazy())
-            {
-                Object bean = getBean(beanDefinition);
-                singletonObjects.put(beanDefinition.getBeanName(),bean);
+
+            if (beanDefinition.isSingleton() && beanDefinition.notLazy()) {
+                getBean(beanDefinition);
             }
 
         });
     }
 
 
-    public Map<String ,Object> singletonObjects = new HashMap<>();
+    public Map<String, Object> singletonObjects = new HashMap<>();
 
+    /**
+     * 给一个BeanDefinition然后实例化后返回Bean
+     *
+     * @return
+     */
     @SneakyThrows
-    public Object getBean(BeanDefinition bean)
-    {
+    public Object getBean(BeanDefinition beanDefinition) {
         //这里如果不是配置类直接调用方法获取返回值！！！！
-        return bean.getMethod().invoke(singletonObjects.get(configName));
+        beanDefinition.setInited(true);
+        Object bean = createBean(beanDefinition);
+        singletonObjects.put(beanDefinition.getBeanName(), bean);
+        return bean;
     }
 
-    public Object findBean(String name)
-    {
+    @SneakyThrows
+    public Object createBean(BeanDefinition beanDefinition) {
+        Object entity = singletonObjects.get(beanDefinition.getBeanName());
+        if (entity != null) {
+            return entity;
+        }
+
+        Method beanMethod = beanDefinition.getMethod();
+        if(beanMethod!=null)
+        {
+            if (beanDefinition.getMethod().isAnnotationPresent(Bean.class)) {
+                Method method = beanDefinition.getMethod();
+                Object configEntity = singletonObjects.get(beanDefinition.getParentName());
+                return method.invoke(configEntity);
+            }
+        }
+
+        //todo 其他操作，比如就是
+        //其他不是bean的操作
+
+        Constructor constructor = beanDefinition.getBeanClass().getConstructor(beanDefinition.getParams());
+        Object bean = constructor.newInstance(beanDefinition.getArgs());
+        singletonObjects.put(beanDefinition.getBeanName(), bean);
+        return bean;
+
+
+
+    }
+
+    /**
+     * 按照名称查找一个Bean
+     *
+     * @param name
+     * @return
+     */
+    public Object findBean(String name) {
         return singletonObjects.get(name);
     }
 
 
-    public BeanDefinition getBeanDefinition(String name)
-    {
+    /**
+     * 给一个名字获取BeanDefinition
+     *
+     * @param name
+     * @return
+     */
+    public BeanDefinition getBeanDefinition(String name) {
         return beanDefinitionMap.get(name);
     }
 
-    public void initLazy(BeanDefinition bean)
-    {
-        singletonObjects.put(bean.getBeanName(),getBean(bean));
-        bean.setLazy(false);
+    public void initConfig() {
+
+        beanDefinitionMap.forEach((name, candidate) ->
+        {
+            if (candidate.getBeanClass().isAnnotationPresent(Configuration.class)) {
+                getBean(candidate);
+            }
+        });
+
     }
 
+
+    /**
+     * 这里的任务就是从配置类里解析一堆bean然后变成BeanDefinition
+     *
+     * @param bean
+     */
     @SneakyThrows
-    public void refresh() {
-        BeanDefinition bean = getBeanDefinition(configName);
-
+    private void parserConfig(BeanDefinition bean) {
         Class beanClass = bean.getBeanClass();
-
-        //先整好配置类实例化
-        Constructor constructor = bean.getBeanClass().getConstructor(bean.getParams());
-        Object o = constructor.newInstance(bean.getArgs());
-        singletonObjects.put(bean.getBeanName(),o);
 
         // 遍历所有方法，通过注解找出来有bean的方法
         for (Method method : beanClass.getDeclaredMethods()) {
@@ -90,24 +144,59 @@ public class BeanFactory {
 
                 String name = annotation.name();
 
-                if(name==null||name.length()<1)
-                {
+                if (name == null || name.length() < 1) {
                     name = method.getName();
                 }
 
-                boolean lazy = annotation.lazy();
+                boolean lazy = method.isAnnotationPresent(Lazy.class);
 
-                String scope = annotation.scope();
+                String scope = "singleton";
+
+                if (method.isAnnotationPresent(Scope.class)) {
+                    Scope scopeTag = method.getAnnotation(Scope.class);
+                    scope = scopeTag.value();
+                }
 
                 Class<?> returnType = method.getReturnType();
 
-                //todo 参数怎么办？
+                BeanDefinition beanDefinition = new BeanDefinition().setBeanClass(returnType)
+                        .setBeanName(name).setLazy(lazy)
+                        .setScope(scope).setMethod(method).setParentName(bean.getBeanName());
 
-                BeanDefinition beanDefinition = new BeanDefinition().setBeanClass(returnType).setBeanName(name).setLazy(lazy).setScope(scope).setMethod(method);
-
-                beanDefinitionMap.put(name,beanDefinition);
+                beanDefinitionMap.put(name, beanDefinition);
 
             }
         }
+    }
+
+    /**
+     * 从配置类里面获取到Bean
+     */
+    @SneakyThrows
+    public void refresh() {
+
+        beanDefinitionMap.forEach((name, candidate) ->
+        {
+            if (candidate.getBeanClass().isAnnotationPresent(Configuration.class)) {
+                parserConfig(candidate);
+                scanComponents(candidate);
+            }
+        });
+    }
+
+    public void scanComponents(BeanDefinition config) {
+        Class beanClass = config.getBeanClass();
+        boolean canScan = beanClass.isAnnotationPresent(ComponentScan.class);
+        if (canScan) {
+            ComponentScan componentScan = (ComponentScan) beanClass.getAnnotation(ComponentScan.class);
+            String[] basePackages = componentScan.value();
+            if (basePackages.length < 1) {
+                //如果是空的，就默认包是当前的
+                basePackages = new String[]{beanClass.getPackageName()};
+            }
+
+            this.registry.scan(basePackages);
+        }
+
     }
 }

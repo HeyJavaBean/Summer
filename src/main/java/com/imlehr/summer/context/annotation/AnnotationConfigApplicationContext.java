@@ -14,6 +14,8 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
 
     private final AnnotatedBeanDefinitionReader reader;
 
+    private final ClassPathBeanDefinitionScanner scanner;
+
     private BeanFactory beanFactory;
 
 
@@ -24,15 +26,17 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
         // AnnotatedBeanDefinitionReader是一个读取注解的Bean读取器,现在就是准备组件而已
         reader = new AnnotatedBeanDefinitionReader(this);
         //todo 初始化设置
-        beanFactory = new BeanFactory();
+        beanFactory = new BeanFactory(this);
+        //这个是用来扫描默认标签用的东西
+        scanner = new ClassPathBeanDefinitionScanner(this);
     }
 
     /**
      * 让reader去注册他
      */
-    public void register(Class component) {
+    public void register(Class... componentClasses) {
         //懒得做NPE处理了 这里就是把注册到的那个放入到beanFactory里
-        this.reader.doRegisterBean(component);
+        this.reader.register(componentClasses);
     }
 
     @Override
@@ -42,12 +46,25 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     }
 
     /**
+     * 使用扫描器进行扫描，这里我就先自己设计了
+     * @param basePackages
+     */
+    @Override
+    public void scan(String... basePackages) {
+        scanner.scan(basePackages);
+    }
+
+    /**
      * 暂时不考虑线程安全和异常情况
      * 不支持扩展功能
      */
     public void refresh() {
 
-        //这里是用来把配置类里的所有内容提取出来用的
+
+        //先整好配置类实例化
+        beanFactory.initConfig();
+
+        //这里是用来把配置类里的所有内容提取出来用，包括扫描的东西
         beanFactory.refresh();
 
         // Instantiate all remaining (non-lazy-init) singletons.
@@ -58,18 +75,23 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     @Override
     public Object getBean(String name)
     {
+        return doGetBean(name);
+    }
+
+    private Object doGetBean(String name)
+    {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(name);
         if(beanDefinition.isSingleton())
         {
-            if(beanDefinition.isLazy())
+            if(beanDefinition.isLazy() && !beanDefinition.isInited())
             {
-                beanFactory.initLazy(beanDefinition);
+                beanFactory.getBean(beanDefinition);
             }
             return beanFactory.findBean(name);
         }
         else
         {
-            return beanFactory.getBean(beanDefinition);
+            return beanFactory.createBean(beanDefinition);
         }
     }
 
@@ -77,12 +99,12 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
 
     /**
      * 这里目前是只支持传入一个类，以后再来扩展
-     * @param component
+     * component
      */
-    public AnnotationConfigApplicationContext(Class component)
+    public AnnotationConfigApplicationContext(Class... componentClasses)
     {
         this();
-        register(component);
+        register(componentClasses);
         refresh();
     }
 

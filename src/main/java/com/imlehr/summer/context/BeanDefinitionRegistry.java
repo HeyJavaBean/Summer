@@ -11,4 +11,6 @@ public interface BeanDefinitionRegistry {
 
     BeanFactory getBeanFactory();
 
+    void scan(String... basePackages);
+
 }

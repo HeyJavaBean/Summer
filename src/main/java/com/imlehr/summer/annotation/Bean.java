@@ -17,8 +17,4 @@ public @interface Bean {
 
     String name() default "";
 
-    boolean lazy() default false;
-
-    String scope() default "singleton";
-
 }

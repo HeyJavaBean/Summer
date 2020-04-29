@@ -1,13 +1,13 @@
 package com.imlehr.summer.test;
 
-import com.imlehr.summer.annotation.Bean;
-import com.imlehr.summer.annotation.Configuration;
+import com.imlehr.summer.annotation.*;
 
 /**
  * @author Lehr
  * @create: 2020-04-26
  */
 @Configuration
+@ComponentScan("com.imlehr.summer.test.scanner")
 public class MyConfig {
 
     @Bean
@@ -16,13 +16,15 @@ public class MyConfig {
         return new Person().setAge("20").setName("Lehr");
     }
 
-    @Bean(name = "Bruce",lazy = true)
+    @Lazy
+    @Bean(name = "Bruce")
     public Person person()
     {
         return new Person().setAge("20").setName("Bruce");
     }
 
-    @Bean(name = "people", scope = "prototype")
+    @Scope("prototype")
+    @Bean(name = "people")
     public Person people01()
     {
         return new Person().setAge("22").setName("people");

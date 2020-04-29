@@ -1,3 +1,19 @@
 
+V
+squid:S106"9Replace this use of System.out or System.err by a logger.(ì†èô8ÎàØ›.
+©%squid:RedundantThrowsDeclarationCheck"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ÙØ¤Şıÿÿÿÿ8Şï„Ø›.
+V
+squid:S106"9Replace this use of System.out or System.err by a logger.(êúíÈ8ØæØ›.
+[
+squid:S106"9Replace this use of System.out or System.err by a logger.(ûûšÌùÿÿÿÿ8ñ£êØ›.
+[
+squid:S106"9Replace this use of System.out or System.err by a logger.(Óê¬×ıÿÿÿÿ8Å—èØ›.
+[
+squid:S106"9Replace this use of System.out or System.err by a logger.(ıÏéÿÿÿÿÿ8ÎàØ›.
+[
+squid:S106"9Replace this use of System.out or System.err by a logger.(ûûšÌùÿÿÿÿ8ñ£êØ›.
 T
-squid:S106"9Replace this use of System.out or System.err by a logger.(ıÏéÿÿÿÿÿ
+squid:S106"9Replace this use of System.out or System.err by a logger.(ıÏéÿÿÿÿÿ
+jsquid:S1192"GDefine a constant instead of duplicating this literal "people" 3 times.(ûûšÌùÿÿÿÿ8ñ£êØ›.
+[
+squid:S106"9Replace this use of System.out or System.err by a logger.(ûûšÌùÿÿÿÿ8ñ£êØ›.
