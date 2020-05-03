@@ -1,7 +1,8 @@
 package com.imlehr.summer.test;
 
 import com.imlehr.summer.context.ApplicationContext;
-import com.imlehr.summer.context.annotation.AnnotationConfigApplicationContext;
+import com.imlehr.summer.context.AnnotationConfigApplicationContext;
+import com.imlehr.summer.test.scanner.component.MyComponent;
 
 /**
  * @author lehr
@@ -25,6 +26,9 @@ public class SpringTest{
         System.out.println(ac.getBean("people"));
         System.out.println(ac.getBean("people"));
         System.out.println(ac.getBean("people"));
+
+        ((MyComponent)ac.getBean("com.imlehr.summer.test.scanner.component.MyComponent")).ss();
+
 
     }
 

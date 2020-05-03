@@ -1,3 +1,6 @@
 
-–"squid:ClassVariableVisibilityCheck/"\Make singletonObjects a static final constant or non-public and provide accessors if needed.(§Ã“óıÿÿÿÿ8öÂÖ›.
-Usquid:S1135h"2Complete the task associated to this TODO comment.(ü”ÿÿÿÿÿ8ıÁåÕ›.
+Qsquid:S1135‹"2Complete the task associated to this TODO comment.(©ëÏş8úÍ½Ğœ.
+qsquid:S3824x"NReplace this "Map.get()" and condition with a call to "Map.computeIfAbsent()".(òÿŞ©øÿÿÿÿ8¡âÜĞœ.
+~squid:S3923b"[Remove this conditional structure or edit its code blocks so that they're not all the same.(ÇöÅÇøÿÿÿÿ8©»íĞœ.
+Qsquid:S1135"2Complete the task associated to this TODO comment.(‹¥áÚ8úÍ½Ğœ.
+Nsquid:S1066–"/Merge this if statement with the enclosing one.(—Ş8úÍ½Ğœ.

@@ -1,10 +1,8 @@
-package com.imlehr.summer.beans;
+package com.imlehr.summer.beans.definition;
 
 import jdk.internal.jline.internal.Nullable;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.lang.reflect.Method;
 
 /**
  * @author Lehr

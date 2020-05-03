@@ -1,9 +1,14 @@
-package com.imlehr.summer.context.annotation;
+package com.imlehr.summer.context;
 
-import com.imlehr.summer.beans.BeanDefinition;
+import com.imlehr.summer.beans.definition.BeanDefinition;
 import com.imlehr.summer.beans.factory.BeanFactory;
 import com.imlehr.summer.context.ApplicationContext;
-import com.imlehr.summer.context.BeanDefinitionRegistry;
+import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
+import com.imlehr.summer.context.component.AnnotatedBeanDefinitionReader;
+import com.imlehr.summer.context.component.ClassPathBeanDefinitionScanner;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author Lehr
@@ -19,23 +24,25 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     private BeanFactory beanFactory;
 
 
+
+
     /**
      * 准备reader，然后我自己设计的这里是准备BeanFactory
      */
     public AnnotationConfigApplicationContext() {
-        // AnnotatedBeanDefinitionReader是一个读取注解的Bean读取器,现在就是准备组件而已
+        // 给定目标，读入组件
         reader = new AnnotatedBeanDefinitionReader(this);
+        // 对目标包进行扫描用的
+        scanner = new ClassPathBeanDefinitionScanner(this);
         //todo 初始化设置
         beanFactory = new BeanFactory(this);
-        //这个是用来扫描默认标签用的东西
-        scanner = new ClassPathBeanDefinitionScanner(this);
     }
 
     /**
      * 让reader去注册他
      */
+    @Override
     public void register(Class... componentClasses) {
-        //懒得做NPE处理了 这里就是把注册到的那个放入到beanFactory里
         this.reader.register(componentClasses);
     }
 
@@ -61,12 +68,13 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     public void refresh() {
 
 
-        //先整好配置类实例化
-        beanFactory.initConfig();
+        //出于设计需求，这里就先把config给实例化了，这里可能会遇到config的循环依赖问题，先跳过这个问题咱们
+        beanFactory.preInit();
 
         //这里是用来把配置类里的所有内容提取出来用，包括扫描的东西
         beanFactory.refresh();
 
+        //彻底把所有的bean definition给bean化了
         // Instantiate all remaining (non-lazy-init) singletons.
         beanFactory.preInstantiateSingletons();
 
@@ -91,7 +99,7 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
         }
         else
         {
-            return beanFactory.createBean(beanDefinition);
+            return beanFactory.createProto(beanDefinition);
         }
     }
 
@@ -108,6 +116,8 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
         refresh();
     }
 
-
-
+    @Override
+    public void registBean(List<Method> beans,Object configBean) {
+        reader.registBeanAnotation(beans,configBean);
+    }
 }

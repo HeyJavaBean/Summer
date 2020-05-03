@@ -11,4 +11,9 @@
       </profile>
     </annotationProcessing>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Summer.main" options="--add-exports jdk.internal.le/jdk.internal.jline.internal=ALL-UNNAMED" />
+    </option>
+  </component>
 </project>

@@ -1,6 +1,9 @@
-package com.imlehr.summer.context;
+package com.imlehr.summer.beans.definition;
 
 import com.imlehr.summer.beans.factory.BeanFactory;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author Lehr
@@ -12,5 +15,9 @@ public interface BeanDefinitionRegistry {
     BeanFactory getBeanFactory();
 
     void scan(String... basePackages);
+
+    void register(Class... componentClasses);
+
+    void registBean(List<Method> beans,Object configBean);
 
 }
