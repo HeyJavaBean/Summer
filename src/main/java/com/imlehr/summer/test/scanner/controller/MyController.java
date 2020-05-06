@@ -1,7 +1,6 @@
 package com.imlehr.summer.test.scanner.controller;
 
-import com.imlehr.summer.annotation.Component;
-import com.imlehr.summer.annotation.Controller;
+import com.imlehr.summer.annotation.scan.Controller;
 
 @Controller
 public class MyController {

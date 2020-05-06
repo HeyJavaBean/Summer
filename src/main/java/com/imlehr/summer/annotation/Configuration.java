@@ -1,6 +1,6 @@
 package com.imlehr.summer.annotation;
 
-import com.imlehr.summer.annotation.Component;
+import com.imlehr.summer.annotation.scan.Component;
 
 import java.lang.annotation.*;
 

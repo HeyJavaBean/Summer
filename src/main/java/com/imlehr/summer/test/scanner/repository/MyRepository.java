@@ -1,7 +1,6 @@
 package com.imlehr.summer.test.scanner.repository;
 
-import com.imlehr.summer.annotation.Controller;
-import com.imlehr.summer.annotation.Repository;
+import com.imlehr.summer.annotation.scan.Repository;
 
 @Repository
 public class MyRepository {

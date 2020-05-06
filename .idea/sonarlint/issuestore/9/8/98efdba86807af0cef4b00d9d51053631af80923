@@ -1,0 +1,7 @@
+
+O
+squid:S106"9Replace this use of System.out or System.err by a logger.(ÏÅ¬Ê
+usquid:S1171"YMove the contents of this initializer to a standard constructor or to field initializers.(ÒÌâ–øÿÿÿÿ
+hsquid:UselessImportCheck"DRemove this unused import 'com.imlehr.summer.annotation.Repository'.(œ‚Œ
+V
+squid:S106"9Replace this use of System.out or System.err by a logger.(û¥‰8±©¸Í.

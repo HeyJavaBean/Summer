@@ -74,6 +74,9 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
         //这里是用来把配置类里的所有内容提取出来用，包括扫描的东西
         beanFactory.refresh();
 
+        //然后再把aop的配置给弄了，提前生成好代理对象
+        beanFactory.getProxy();
+
         //彻底把所有的bean definition给bean化了
         // Instantiate all remaining (non-lazy-init) singletons.
         beanFactory.preInstantiateSingletons();

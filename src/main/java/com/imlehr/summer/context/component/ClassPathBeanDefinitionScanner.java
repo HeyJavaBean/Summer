@@ -1,11 +1,9 @@
 package com.imlehr.summer.context.component;
 
-import com.imlehr.summer.annotation.Component;
-import com.imlehr.summer.annotation.Controller;
-import com.imlehr.summer.annotation.Repository;
-import com.imlehr.summer.annotation.Service;
-import com.imlehr.summer.beans.definition.BeanDefinition;
-import com.imlehr.summer.beans.definition.BeanDefinitionHolder;
+import com.imlehr.summer.annotation.scan.Component;
+import com.imlehr.summer.annotation.scan.Controller;
+import com.imlehr.summer.annotation.scan.Repository;
+import com.imlehr.summer.annotation.scan.Service;
 import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
 import lombok.SneakyThrows;
 

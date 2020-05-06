@@ -1,15 +1,21 @@
 package com.imlehr.summer.beans.factory;
 
 import com.imlehr.summer.annotation.*;
+import com.imlehr.summer.annotation.aspect.After;
+import com.imlehr.summer.annotation.aspect.Aspect;
+import com.imlehr.summer.annotation.aspect.Before;
+import com.imlehr.summer.annotation.aspect.Pointcut;
+import com.imlehr.summer.beans.AopConfig;
 import com.imlehr.summer.beans.definition.BeanDefinition;
 import com.imlehr.summer.beans.definition.BeanDefinitionHolder;
 import com.imlehr.summer.beans.object.ObjectFactory;
 import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
+import com.imlehr.summer.context.AopHandler;
+import com.imlehr.summer.test.scanner.component.TestInterface;
+import com.imlehr.summer.utils.AspectJUtils;
 import lombok.SneakyThrows;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -173,6 +179,11 @@ public class BeanFactory {
 
     }
 
+
+
+
+
+
     private Object getSingleton(String beanName) {
         //先从一级缓存池里尝试获取
         Object singletonObject = this.singletonObjects.get(beanName);
@@ -279,4 +290,76 @@ public class BeanFactory {
         }
 
     }
+
+
+
+    public void getProxy()
+    {
+        beanDefinitionMap.values().forEach(bd->
+        {
+            if(bd.getBeanClass().isAnnotationPresent(Aspect.class))
+            {
+                doProxy(bd);
+            }
+        });
+    }
+
+    private void doProxy(BeanDefinition beanDefinition)
+    {
+        AopConfig aopConfig = new AopConfig();
+
+        aopConfig.setEntity(getBean(beanDefinition));
+
+        for (Method method : beanDefinition.getBeanClass().getDeclaredMethods()) {
+
+            //todo 所以这里只能处理这种残疾的写法,后面的方法都只能套在pointcut上面
+
+            if(method.isAnnotationPresent(Pointcut.class))
+            {
+                Pointcut p = method.getAnnotation(Pointcut.class);
+                String el = p.value();
+                List<Class> classes = AspectJUtils.parseAspectEL(el);
+                aopConfig.setAopClassess(classes);
+                continue;
+            }
+            if(method.isAnnotationPresent(Before.class))
+            {
+                aopConfig.setBeforeMethod(method);
+                continue;
+            }
+            if(method.isAnnotationPresent(After.class))
+            {
+                aopConfig.setAfterMethod(method);
+                continue;
+            }
+
+
+        }
+
+        createProxy(aopConfig);
+
+    }
+
+    private void createProxy(AopConfig aopConfig)
+    {
+        //TODO 暂时在处理名字上有困难，默认用类名，查找还需要改进
+        aopConfig.getAopClassess().forEach(cls->{
+            Object bean = getBean(beanDefinitionMap.get(cls.getName()));
+            Object proxy = doCreateProxyBean(bean, aopConfig);
+
+            //todo 目前是使用JDK动态代理，所以还是没能解决非要让aspect对象有接口的问题
+
+            singletonObjects.put(cls.getName(),proxy);
+        });
+
+    }
+
+    private Object doCreateProxyBean(Object target, AopConfig aopConfig)
+    {
+
+        Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
+                new AopHandler(target,aopConfig));
+        return o;
+    }
+
 }

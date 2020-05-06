@@ -1,6 +1,13 @@
 
-Qsquid:S1135‹"2Complete the task associated to this TODO comment.(©ëÏş8úÍ½Ğœ.
-qsquid:S3824x"NReplace this "Map.get()" and condition with a call to "Map.computeIfAbsent()".(òÿŞ©øÿÿÿÿ8¡âÜĞœ.
-~squid:S3923b"[Remove this conditional structure or edit its code blocks so that they're not all the same.(ÇöÅÇøÿÿÿÿ8©»íĞœ.
-Qsquid:S1135"2Complete the task associated to this TODO comment.(‹¥áÚ8úÍ½Ğœ.
-Nsquid:S1066–"/Merge this if statement with the enclosing one.(—Ş8úÍ½Ğœ.
+Psquid:S1612â",Replace this lambda with a method reference.(åšª˜ıÿÿÿÿ8Ì°õ„.
+jsquid:UselessImportCheck
+":Remove this unused import 'java.lang.reflect.Constructor'.(¿ã–şúÿÿÿÿ8Î”»Ì.
+Gsquid:S1148…"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8÷ûÍ.
+Osquid:S1602z",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8”çÎÌ.
+Gsquid:S1148¤"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8ğ±€Î.
+W
+squid:S106„"9Replace this use of System.out or System.err by a logger.(‰°ï—8èÓüÍ.
+Psquid:S1602™",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8ÎùèÌ.
+rsquid:S3824·"NReplace this "Map.get()" and condition with a call to "Map.computeIfAbsent()".(òÿŞ©øÿÿÿÿ8¡âÜĞœ.
+W
+squid:S106£"9Replace this use of System.out or System.err by a logger.(‰°ï—8ğ±€Î.
