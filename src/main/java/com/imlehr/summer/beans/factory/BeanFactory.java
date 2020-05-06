@@ -10,10 +10,10 @@ import com.imlehr.summer.beans.definition.BeanDefinition;
 import com.imlehr.summer.beans.definition.BeanDefinitionHolder;
 import com.imlehr.summer.beans.object.ObjectFactory;
 import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
-import com.imlehr.summer.context.AopHandler;
-import com.imlehr.summer.test.scanner.component.TestInterface;
+import com.imlehr.summer.context.AopMethodIntercreptor;
 import com.imlehr.summer.utils.AspectJUtils;
 import lombok.SneakyThrows;
+import net.sf.cglib.proxy.Enhancer;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -345,7 +345,12 @@ public class BeanFactory {
         //TODO 暂时在处理名字上有困难，默认用类名，查找还需要改进
         aopConfig.getAopClassess().forEach(cls->{
             Object bean = getBean(beanDefinitionMap.get(cls.getName()));
-            Object proxy = doCreateProxyBean(bean, aopConfig);
+
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(bean.getClass());
+            enhancer.setCallback(new AopMethodIntercreptor(bean,aopConfig));
+
+            Object proxy = enhancer.create();
 
             //todo 目前是使用JDK动态代理，所以还是没能解决非要让aspect对象有接口的问题
 
@@ -354,12 +359,5 @@ public class BeanFactory {
 
     }
 
-    private Object doCreateProxyBean(Object target, AopConfig aopConfig)
-    {
-
-        Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
-                new AopHandler(target,aopConfig));
-        return o;
-    }
 
 }

@@ -5,7 +5,7 @@ import com.imlehr.summer.annotation.scan.Component;
 import com.imlehr.summer.test.scanner.service.MyService;
 
 @Component
-public class MyComponent implements TestInterface{
+public class MyComponent{
 
 
     @Autowired
@@ -14,7 +14,6 @@ public class MyComponent implements TestInterface{
         System.out.println("Hey I'm the component");
     }
 
-    @Override
     public void ss()
     {
         service.says();

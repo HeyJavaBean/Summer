@@ -2,27 +2,40 @@ package com.imlehr.summer.context;
 
 import com.imlehr.summer.beans.AopConfig;
 import lombok.SneakyThrows;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
  * @author Lehr
  * @create: 2020-05-06
  */
-public class AopHandler implements InvocationHandler {
+public class AopMethodIntercreptor implements MethodInterceptor {
+
+
+
 
     private Object target;
     private AopConfig aopConfig;
 
-    public AopHandler(Object target, AopConfig aopConfig) {
+    public AopMethodIntercreptor(Object target, AopConfig aopConfig) {
         this.target = target;
         this.aopConfig = aopConfig;
     }
 
 
+
+    @SneakyThrows
+    private void invokeAop(Method method) {
+        if (method != null) {
+            method.invoke(aopConfig.getEntity());
+        }
+
+    }
+
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 
         invokeAop(aopConfig.getBeforeMethod());
 
@@ -32,13 +45,5 @@ public class AopHandler implements InvocationHandler {
         invokeAop(aopConfig.getAfterMethod());
 
         return returnValue;
-    }
-
-    @SneakyThrows
-    private void invokeAop(Method method) {
-        if (method != null) {
-            method.invoke(aopConfig.getEntity());
-        }
-
     }
 }

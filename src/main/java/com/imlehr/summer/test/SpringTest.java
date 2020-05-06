@@ -3,7 +3,6 @@ package com.imlehr.summer.test;
 import com.imlehr.summer.context.ApplicationContext;
 import com.imlehr.summer.context.AnnotationConfigApplicationContext;
 import com.imlehr.summer.test.scanner.component.MyComponent;
-import com.imlehr.summer.test.scanner.component.TestInterface;
 
 /**
  * @author lehr
@@ -30,7 +29,7 @@ public class SpringTest{
 
         System.out.println("\n\n\n");
 
-        ((TestInterface)ac.getBean("com.imlehr.summer.test.scanner.component.MyComponent")).ss();
+        ((MyComponent)ac.getBean("com.imlehr.summer.test.scanner.component.MyComponent")).ss();
 
 
     }

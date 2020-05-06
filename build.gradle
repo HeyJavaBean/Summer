@@ -23,4 +23,8 @@ dependencies {
     implementation 'junit:junit:4.12'
     implementation 'org.testng:testng:6.9.6'
 
+    //cglib
+    compile group: 'cglib', name: 'cglib', version: '3.3.0'
+
+
 }
