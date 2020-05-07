@@ -1,10 +1,7 @@
 package com.imlehr.summer.beans.factory;
 
 import com.imlehr.summer.annotation.*;
-import com.imlehr.summer.annotation.aspect.After;
-import com.imlehr.summer.annotation.aspect.Aspect;
-import com.imlehr.summer.annotation.aspect.Before;
-import com.imlehr.summer.annotation.aspect.Pointcut;
+import com.imlehr.summer.annotation.aspect.*;
 import com.imlehr.summer.beans.AopConfig;
 import com.imlehr.summer.beans.definition.BeanDefinition;
 import com.imlehr.summer.beans.definition.BeanDefinitionHolder;
@@ -332,6 +329,26 @@ public class BeanFactory {
                 aopConfig.setAfterMethod(method);
                 continue;
             }
+            if(method.isAnnotationPresent(Around.class))
+            {
+                aopConfig.setAroundMethod(method);
+                continue;
+            }
+            if(method.isAnnotationPresent(AfterReturning.class))
+            {
+                AfterReturning tag = method.getAnnotation(AfterReturning.class);
+                aopConfig.setResultName(tag.returning());
+                aopConfig.setAfterReturningMethod(method);
+                continue;
+            }
+            if(method.isAnnotationPresent(AfterThrowing.class))
+            {
+                AfterThrowing tag = method.getAnnotation(AfterThrowing.class);
+                aopConfig.setExceptionName(tag.throwing());
+                aopConfig.setAfterThrowingMethod(method);
+                continue;
+            }
+
 
 
         }

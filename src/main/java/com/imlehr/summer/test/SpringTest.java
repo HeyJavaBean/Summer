@@ -29,7 +29,7 @@ public class SpringTest{
 
         System.out.println("\n\n\n");
 
-        ((MyComponent)ac.getBean("com.imlehr.summer.test.scanner.component.MyComponent")).ss();
+        ((MyComponent)ac.getBean("com.imlehr.summer.test.scanner.component.MyComponent")).sayHey();
 
 
     }

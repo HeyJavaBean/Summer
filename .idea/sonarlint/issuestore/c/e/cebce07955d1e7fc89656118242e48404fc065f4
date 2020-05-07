@@ -1,4 +1,4 @@
 
-usquid:S1171"YMove the contents of this initializer to a standard constructor or to field initializers.(ÒÌâ–øÿÿÿÿ
-N
-squid:S106"9Replace this use of System.out or System.err by a logger.(Â•Ïo
+S
+squid:S106"9Replace this use of System.out or System.err by a logger.(Â•Ïo8Ðö¡Ñž.
+zsquid:S1171"YMove the contents of this initializer to a standard constructor or to field initializers.(ÒÌâ–øÿÿÿÿ8Ðö¡Ñž.

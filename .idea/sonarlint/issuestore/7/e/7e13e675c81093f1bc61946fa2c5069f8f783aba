@@ -1,19 +1,10 @@
 
-[
-squid:S106"9Replace this use of System.out or System.err by a logger.(ûûšÌùÿÿÿÿ8ñ£êØ›.
-[
-squid:S106"9Replace this use of System.out or System.err by a logger.(Óê¬×ıÿÿÿÿ8Å—èØ›.
+§%squid:RedundantThrowsDeclarationCheck"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ÙØ¤Şıÿÿÿÿ8æôªÒ.
 T
-squid:S106"9Replace this use of System.out or System.err by a logger.(ıÏéÿÿÿÿÿ
-jsquid:S1192"GDefine a constant instead of duplicating this literal "people" 3 times.(ûûšÌùÿÿÿÿ8ñ£êØ›.
-V
-squid:S106"9Replace this use of System.out or System.err by a logger.(êúíÈ8ØæØ›.
-[
-squid:S106"9Replace this use of System.out or System.err by a logger.(ûûšÌùÿÿÿÿ8ñ£êØ›.
-[
-squid:S106"9Replace this use of System.out or System.err by a logger.(ûûšÌùÿÿÿÿ8ñ£êØ›.
-[
-squid:S106"9Replace this use of System.out or System.err by a logger.(ıÏéÿÿÿÿÿ8ÎàØ›.
-V
-squid:S106"9Replace this use of System.out or System.err by a logger.(ì†èô8ÎàØ›.
-©%squid:RedundantThrowsDeclarationCheck"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ÙØ¤Şıÿÿÿÿ8±©¢Î.
+squid:S106"9Replace this use of System.out or System.err by a logger.(¦¯Å¢8æôªÒ.
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ï°œøÿÿÿÿ8æôªÒ.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ó–‡˜8æôªÒ.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(öŸà—8æôªÒ.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(öŸà—8æôªÒ.
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ËĞ—Øûÿÿÿÿ8æôªÒ.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(û¿¥Ú8æôªÒ.

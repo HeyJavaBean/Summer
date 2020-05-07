@@ -1,6 +1,7 @@
 package com.imlehr.summer.context;
 
 import com.imlehr.summer.beans.AopConfig;
+import com.imlehr.summer.beans.ProceedingJointPoint;
 import lombok.SneakyThrows;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -26,24 +27,15 @@ public class AopMethodIntercreptor implements MethodInterceptor {
 
 
 
-    @SneakyThrows
-    private void invokeAop(Method method) {
-        if (method != null) {
-            method.invoke(aopConfig.getEntity());
-        }
-
-    }
-
     @Override
+    @SneakyThrows
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 
-        invokeAop(aopConfig.getBeforeMethod());
+        ProceedingJointPoint jointPoint = new ProceedingJointPoint().setAopConfig(aopConfig)
+                .setArgs(args).setCoreMethod(method).setTarget(target);
 
-        // 执行目标对象方法
-        Object returnValue = method.invoke(target, args);
+        jointPoint.setSignature(method.toString());
 
-        invokeAop(aopConfig.getAfterMethod());
-
-        return returnValue;
+        return aopConfig.invokeAround(jointPoint);
     }
 }

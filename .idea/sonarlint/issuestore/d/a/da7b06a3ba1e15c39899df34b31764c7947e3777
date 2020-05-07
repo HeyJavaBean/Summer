@@ -1,13 +1,17 @@
 
-Psquid:S1612â",Replace this lambda with a method reference.(åšª˜ıÿÿÿÿ8Ì°õ„.
-jsquid:UselessImportCheck
-":Remove this unused import 'java.lang.reflect.Constructor'.(¿ã–şúÿÿÿÿ8Î”»Ì.
-Gsquid:S1148…"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8÷ûÍ.
-Osquid:S1602z",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8”çÎÌ.
-Gsquid:S1148¤"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8ğ±€Î.
-W
-squid:S106„"9Replace this use of System.out or System.err by a logger.(‰°ï—8èÓüÍ.
-Psquid:S1602™",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8ÎùèÌ.
-rsquid:S3824·"NReplace this "Map.get()" and condition with a call to "Map.computeIfAbsent()".(òÿŞ©øÿÿÿÿ8¡âÜĞœ.
-W
-squid:S106£"9Replace this use of System.out or System.err by a logger.(‰°ï—8ğ±€Î.
+Ssquid:S1135"2Complete the task associated to this TODO comment.(ÕºñŸùÿÿÿÿ8Â›šÒ.
+T
+squid:S106"9Replace this use of System.out or System.err by a logger.(‰°ï—8Â›šÒ.
+Dsquid:S1148"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8Â›šÒ.
+Msquid:S1602",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8Â›šÒ.
+Msquid:S1602",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8Â›šÒ.
+T
+squid:S106"9Replace this use of System.out or System.err by a logger.(‰°ï—8Â›šÒ.
+Ssquid:S1135"2Complete the task associated to this TODO comment.(Ó¬ôıÿÿÿÿ8Â›šÒ.
+7squid:S3626"Remove this redundant jump.(ÉŠ©ƒ8Â›šÒ.
+Dsquid:S1148"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8Â›šÒ.
+Nsquid:S1135"2Complete the task associated to this TODO comment.(ù´œÄ8Â›šÒ.
+y
+squid:S135"YReduce the total number of break and continue statements in this loop to use at most one.(‘â°¡üÿÿÿÿ8Â›šÒ.
+osquid:S3824"NReplace this "Map.get()" and condition with a call to "Map.computeIfAbsent()".(òÿŞ©øÿÿÿÿ8Â›šÒ.
+Msquid:S1612",Replace this lambda with a method reference.(åšª˜ıÿÿÿÿ8Â›šÒ.

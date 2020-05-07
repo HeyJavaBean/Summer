@@ -14,8 +14,10 @@ public class MyComponent{
         System.out.println("Hey I'm the component");
     }
 
-    public void ss()
+    public String sayHey()
     {
-        service.says();
+        //int a = 1/0;
+        System.out.println("now im saying hey");
+        return "nmd";
     }
 }

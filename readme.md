@@ -1,3 +1,7 @@
+# AOP阶段
+参考文档：https://docs.spring.io/spring/docs/5.2.6.RELEASE/spring-framework-reference/core.html#spring-core
+目前在试图模仿写一个简陋的aop功能
+
 # 第一阶段
 -------------
 > 参考内容：https://juejin.im/post/5d455eabe51d4561fd6cb472
@@ -24,9 +28,7 @@
 AliasFor的具体玩法？？？
 
 
-# 目前的疑惑
-- IoC 和 DI 的理解？ 思路和具体实现的关系？
-![](https://pic1.zhimg.com/v2-d1894656e55d9db98345b7f75c1c4260_r.jpg)
+![](https://user-gold-cdn.xitu.io/2019/10/18/16ddda0ffaad67f1?imageslim)
  
  
  
