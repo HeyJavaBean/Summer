@@ -18,6 +18,7 @@ public class MyComponent{
     {
         //int a = 1/0;
         System.out.println("now im saying hey");
+        service.says();
         return "nmd";
     }
 }

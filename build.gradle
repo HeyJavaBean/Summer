@@ -8,6 +8,7 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
 }
 
@@ -25,6 +26,9 @@ dependencies {
 
     //cglib
     compile group: 'cglib', name: 'cglib', version: '3.3.0'
+
+    //ASM 获取方法参数名用的
+    compile group: 'com.github.houbb', name: 'asm-tool', version: '0.0.3'
 
 
 }

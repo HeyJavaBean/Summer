@@ -11,12 +11,14 @@ import com.imlehr.summer.annotation.*;
 public class MyConfig {
 
     @Bean
+    @Order(12)
     public Person lehr()
     {
         return new Person().setAge("20").setName("Lehr");
     }
 
     @Lazy
+    @Order(1)
     @Bean(name = "Bruce")
     public Person person()
     {

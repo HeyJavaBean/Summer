@@ -1,5 +1,6 @@
 package com.imlehr.summer.beans;
 
+import com.github.houbb.asm.tool.reflection.AsmMethods;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -62,11 +63,21 @@ public class AopConfig {
             Boolean hasJointPoint = false;
 
             for (Parameter p : parameters) {
-                //todo exceptionName.equals(p.getName()) 解决不了名字的问题
-                if(true)
+
+                if(AsmMethods.getParamNamesByAsm(afterThrowingMethod).contains(exceptionName))
                 {
-                    //todo 这里处理不了继承关系
-                    if(p.getType().equals(e.getClass()))
+
+
+                    //明日任务：
+                    // TODO:增加排序，order标签
+                    // TODO:优化代理
+                    // TODO:二重代理
+                    // TODO:参考下SpringAOP
+
+
+
+
+                    if(p.getType().isAssignableFrom(e.getClass()))
                     {
                         hasException = true;
                     }
@@ -150,16 +161,20 @@ public class AopConfig {
             Boolean hasResult = false;
             Boolean hasJointPoint = false;
 
+
+
             for (Parameter p : parameters) {
-                //todo 暂时无法解决获取参数名字的问题：resultName.equals(p.getName())
-                if(true)
+
+                //用了ASM-Tool
+                if(AsmMethods.getParamNamesByAsm(afterReturningMethod).contains(resultName))
                 {
-                    //todo 这里处理不了继承关系
-                    if(result!=null&& p.getType().equals(result.getClass()))
+                    //处理继承关系
+                    if(result!=null&& p.getType().isAssignableFrom(result.getClass()))
                     {
                         hasResult = true;
                     }
                 }
+
                 if(p.getType().equals(JointPoint.class))
                 {
                     hasJointPoint = true;

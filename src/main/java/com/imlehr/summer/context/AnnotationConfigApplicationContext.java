@@ -68,12 +68,14 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     public void refresh() {
 
 
+        beanFactory.sortBeanDefinition();
         //出于设计需求，这里就先把config给实例化了，这里可能会遇到config的循环依赖问题，先跳过这个问题咱们
         beanFactory.preInit();
 
         //这里是用来把配置类里的所有内容提取出来用，包括扫描的东西
         beanFactory.refresh();
 
+        beanFactory.sortBeanDefinition();
         //然后再把aop的配置给弄了，提前生成好代理对象
         beanFactory.getProxy();
 

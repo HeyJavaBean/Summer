@@ -1,5 +1,6 @@
 package com.imlehr.summer.beans.definition;
 
+import com.imlehr.summer.annotation.Ordered;
 import jdk.jfr.DataAmount;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -32,6 +33,8 @@ public class BeanDefinition {
     private String beanName;
 
     private boolean inited;
+
+    private int order = Ordered.LOWEST_PRECEDENCE;
 
     private List<Field> autowireList;
 

@@ -360,6 +360,9 @@ public class BeanFactory {
     private void createProxy(AopConfig aopConfig)
     {
         //TODO 暂时在处理名字上有困难，默认用类名，查找还需要改进
+
+        //TODO 循环依赖的问题还没有解决，导致会拿到原生对象
+
         aopConfig.getAopClassess().forEach(cls->{
             Object bean = getBean(beanDefinitionMap.get(cls.getName()));
 
@@ -368,13 +371,30 @@ public class BeanFactory {
             enhancer.setCallback(new AopMethodIntercreptor(bean,aopConfig));
 
             Object proxy = enhancer.create();
+            //todo 由于 Cglib 本身的设计，无法实现在 Proxy 外面再包装一层 Proxy（JDK Proxy 可以），
+            // 通常会报如下错误：
+            // Duplicate method name "newInstance" with signature
+            // 具体 ： https://www.jianshu.com/p/9ba77d8f200b
+            // 个人暂时还没有能力解决这个问题
 
-            //todo 目前是使用JDK动态代理，所以还是没能解决非要让aspect对象有接口的问题
 
             singletonObjects.put(cls.getName(),proxy);
         });
 
     }
 
+    public void sortBeanDefinition()
+    {
+
+        List<Map.Entry<String,BeanDefinition>> list = new ArrayList<Map.Entry<String,BeanDefinition>>(beanDefinitionMap.entrySet());
+        Collections.sort(list,new Comparator<Map.Entry<String,BeanDefinition>>() {
+            //小的排前面
+            @Override
+            public int compare(Map.Entry<String, BeanDefinition> o1,
+                               Map.Entry<String, BeanDefinition> o2) {
+                return o1.getValue().getOrder() < (o2.getValue().getOrder())?-1:1;
+            }
+        });
+    }
 
 }

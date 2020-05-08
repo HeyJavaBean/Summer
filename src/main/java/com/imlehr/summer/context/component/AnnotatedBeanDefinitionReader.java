@@ -1,13 +1,11 @@
 package com.imlehr.summer.context.component;
 
-import com.imlehr.summer.annotation.Autowired;
-import com.imlehr.summer.annotation.Bean;
-import com.imlehr.summer.annotation.Lazy;
-import com.imlehr.summer.annotation.Scope;
+import com.imlehr.summer.annotation.*;
 import com.imlehr.summer.beans.definition.BeanDefinition;
 import com.imlehr.summer.beans.definition.BeanDefinitionHolder;
 import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,6 +44,13 @@ public class AnnotatedBeanDefinitionReader {
                 .setLazy(false)
                 .setInited(false)
                 .setScope("singleton");
+
+        if(component.isAnnotationPresent(Order.class))
+        {
+            Order order = (Order)component.getAnnotation(Order.class);
+            bean.setOrder(order.value());
+        }
+
 
         List<Field> autowireList = new ArrayList<>();
 
@@ -106,6 +111,12 @@ public class AnnotatedBeanDefinitionReader {
         BeanDefinition beanDefinition = new BeanDefinition().setBeanClass(returnType)
                 .setBeanName(name).setLazy(lazy)
                 .setScope(scope).setMethod(method).setConfigBean(configBean);
+
+        if(method.isAnnotationPresent(Order.class))
+        {
+            Order order = method.getAnnotation(Order.class);
+            beanDefinition.setOrder(order.value());
+        }
 
         BeanDefinitionHolder bdh = new BeanDefinitionHolder().setBeanName(name).setBeanDefinition(beanDefinition);
         //下面是我简写的
