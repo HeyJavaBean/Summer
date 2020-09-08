@@ -1,4 +1,4 @@
-package com.imlehr.summer.beans;
+package com.imlehr.summer.aop.beans;
 
 import com.github.houbb.asm.tool.reflection.AsmMethods;
 import com.google.common.collect.Lists;
@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @author Lehr
  * @create: 2020-05-06
+ * 用来记录某个Bean的AOP相关设定的
  */
 @Data
 @Accessors(chain = true )
@@ -160,8 +161,6 @@ public class AopConfig {
 
             Boolean hasResult = false;
             Boolean hasJointPoint = false;
-
-
 
             for (Parameter p : parameters) {
 

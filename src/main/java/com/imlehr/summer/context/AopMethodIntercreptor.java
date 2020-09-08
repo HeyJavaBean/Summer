@@ -1,7 +1,7 @@
 package com.imlehr.summer.context;
 
-import com.imlehr.summer.beans.AopConfig;
-import com.imlehr.summer.beans.ProceedingJointPoint;
+import com.imlehr.summer.aop.beans.AopConfig;
+import com.imlehr.summer.aop.beans.ProceedingJointPoint;
 import lombok.SneakyThrows;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -13,9 +13,6 @@ import java.lang.reflect.Method;
  * @create: 2020-05-06
  */
 public class AopMethodIntercreptor implements MethodInterceptor {
-
-
-
 
     private Object target;
     private AopConfig aopConfig;

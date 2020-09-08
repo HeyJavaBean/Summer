@@ -3,8 +3,8 @@ package com.imlehr.summer.test.scanner;
 
 import com.imlehr.summer.annotation.aspect.*;
 import com.imlehr.summer.annotation.scan.Component;
-import com.imlehr.summer.beans.JointPoint;
-import com.imlehr.summer.beans.ProceedingJointPoint;
+import com.imlehr.summer.aop.beans.JointPoint;
+import com.imlehr.summer.aop.beans.ProceedingJointPoint;
 
 /**
  * @author Lehr

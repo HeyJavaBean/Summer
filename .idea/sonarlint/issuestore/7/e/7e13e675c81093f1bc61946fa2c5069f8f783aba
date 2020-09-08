@@ -1,10 +1,10 @@
 
-§%squid:RedundantThrowsDeclarationCheck"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ÙØ¤Þýÿÿÿÿ8æôªÒž.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(öŸà—8æôªÒž.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(û¿¥Ú8æôªÒž.
 T
 squid:S106"9Replace this use of System.out or System.err by a logger.(¦¯Å¢8æôªÒž.
-lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ï°œøÿÿÿÿ8æôªÒž.
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ó–‡˜8æôªÒž.
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(öŸà—8æôªÒž.
 gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(öŸà—8æôªÒž.
 lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ËÐ—Øûÿÿÿÿ8æôªÒž.
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(û¿¥Ú8æôªÒž.
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ï°œøÿÿÿÿ8æôªÒž.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ó–‡˜8æôªÒž.
+§%squid:RedundantThrowsDeclarationCheck"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(ÙØ¤Þýÿÿÿÿ8æôªÒž.

@@ -1,4 +1,4 @@
-package com.imlehr.summer.beans;
+package com.imlehr.summer.aop.beans;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

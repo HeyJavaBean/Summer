@@ -3,8 +3,8 @@ package com.imlehr.summer.test.scanner;
 
 import com.imlehr.summer.annotation.aspect.*;
 import com.imlehr.summer.annotation.scan.Component;
-import com.imlehr.summer.beans.JointPoint;
-import com.imlehr.summer.beans.ProceedingJointPoint;
+import com.imlehr.summer.aop.beans.JointPoint;
+import com.imlehr.summer.aop.beans.ProceedingJointPoint;
 
 /**
  * @author Lehr
@@ -17,7 +17,7 @@ public class MyAspect {
     /**
      * 只是用来申明切点
      */
-    @Pointcut("within(com.imlehr.summer.test.scanner.component)")
+    @Pointcut("within(com.imlehr.summer.test.scanner.component.MyComponent)")
     public void pointCut(){};
 
 

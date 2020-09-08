@@ -18,6 +18,10 @@ import java.util.List;
  */
 public class AnnotatedBeanDefinitionReader {
 
+    /**
+     * 这个注册器其实就是IoC Context本身
+     * 这个思路和Tomcat之间容器的关系一样的
+     */
     private BeanDefinitionRegistry registry;
 
     public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry)
@@ -25,6 +29,11 @@ public class AnnotatedBeanDefinitionReader {
         this.registry = registry;
     }
 
+    /**
+     * 拿到类信息然后进行注册用的，可以传入多个config类来配置
+     * 也可以是其他你想注册的Class(自动扫描的时候会调用)
+     * @param componentClasses
+     */
     public void register(Class... componentClasses)
     {
         for (Class<?> componentClass : componentClasses) {
@@ -33,28 +42,35 @@ public class AnnotatedBeanDefinitionReader {
     }
 
     /**
-     * 注册beans
+     * 通过Class注册为BeanDefinition
+     * (除了这个还有另外一种途径，就是通过方法去注册)
      */
     private void doRegisterBean(Class component)
     {
-        //把他抽成bean，然后我把默认的方法配置全部写到里面去了
+        //把配置文件抽象为BeanDefinition，然后填写默认内容
         BeanDefinition bean = new BeanDefinition()
+                //设置真正的类
                 .setBeanClass(component)
+                //设置BeanName，默认为类的名字
                 .setBeanName(component.getName())
+                //不是懒加载
                 .setLazy(false)
+                //是否被实例化了？默认是否
                 .setInited(false)
+                //默认是单例模式
                 .setScope("singleton");
 
+        //如果有加载顺序指定的Order标签，则读取并获取
         if(component.isAnnotationPresent(Order.class))
         {
             Order order = (Order)component.getAnnotation(Order.class);
             bean.setOrder(order.value());
         }
 
-
+        //检查这个类的成员，看是否有需要自动注入的？
         List<Field> autowireList = new ArrayList<>();
 
-        //拿到autowired的类
+        //扫描每一个成员，查看是否有autowire标签
         for (Field field : component.getDeclaredFields()) {
             if(field.isAnnotationPresent(Autowired.class))
             {
@@ -62,15 +78,19 @@ public class AnnotatedBeanDefinitionReader {
             }
         }
 
+        //在BeanDefinition里填写好要autowire的类的list
         bean.setAutowireList(autowireList);
 
+        //以类名->BeanDefinition的方法，封装到bdh里
+        //todo: 这里我忽然想不起在源码里他这样做的意义了....
         BeanDefinitionHolder bdh = new BeanDefinitionHolder().setBeanName(component.getName()).setBeanDefinition(bean);
-        //下面是我简写的
+        //交给registry注册器（其实就是关联回Context容器）去注册
+        //todo: 忽然想不起这种设计模式叫什么了。反正tomcat里也有这个操作
         registry.getBeanFactory().registerBeanDefinition(bdh);
     }
 
     /**
-     * 这个是我专门为了处理有@bean的情况处理的解析bean definition的情况
+     * 用于把Config里通过Bean标签配置的方法的类解析注册的
      */
     public void registBeanAnotation(List<Method> beans,Object configBean)
     {
@@ -88,17 +108,21 @@ public class AnnotatedBeanDefinitionReader {
      */
     private void doRegistBeanAnnotation(Method method,Object configBean)
     {
-        // 获取注解  但是问题是，不得不去和配置类关联起来
+        // 获取注解
+        // todo：但是问题是，在我的实现里不得不去和配置类关联起来，也就是configBean
         Bean annotation = method.getAnnotation(Bean.class);
 
         String name = annotation.name();
 
+        //确定名字
         if (name == null || name.length() < 1) {
             name = method.getName();
         }
 
+        //是否懒加载
         boolean lazy = method.isAnnotationPresent(Lazy.class);
 
+        //确定是singleton还是什么，Scope
         String scope = "singleton";
 
         if (method.isAnnotationPresent(Scope.class)) {
@@ -108,10 +132,12 @@ public class AnnotatedBeanDefinitionReader {
 
         Class<?> returnType = method.getReturnType();
 
+        //设置好这个bean
         BeanDefinition beanDefinition = new BeanDefinition().setBeanClass(returnType)
                 .setBeanName(name).setLazy(lazy)
                 .setScope(scope).setMethod(method).setConfigBean(configBean);
 
+        //设置顺序
         if(method.isAnnotationPresent(Order.class))
         {
             Order order = method.getAnnotation(Order.class);
@@ -119,7 +145,7 @@ public class AnnotatedBeanDefinitionReader {
         }
 
         BeanDefinitionHolder bdh = new BeanDefinitionHolder().setBeanName(name).setBeanDefinition(beanDefinition);
-        //下面是我简写的
+        //加入BeanFactory
         registry.getBeanFactory().registerBeanDefinition(bdh);
     }
 

@@ -2,13 +2,14 @@ package com.imlehr.summer.beans.factory;
 
 import com.imlehr.summer.annotation.*;
 import com.imlehr.summer.annotation.aspect.*;
-import com.imlehr.summer.beans.AopConfig;
+import com.imlehr.summer.aop.ProxyManager;
+import com.imlehr.summer.aop.beans.AopConfig;
 import com.imlehr.summer.beans.definition.BeanDefinition;
 import com.imlehr.summer.beans.definition.BeanDefinitionHolder;
 import com.imlehr.summer.beans.object.ObjectFactory;
 import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
 import com.imlehr.summer.context.AopMethodIntercreptor;
-import com.imlehr.summer.utils.AspectJUtils;
+import com.imlehr.summer.aop.AspectJUtils;
 import lombok.SneakyThrows;
 import net.sf.cglib.proxy.Enhancer;
 
@@ -27,23 +28,42 @@ public class BeanFactory {
      */
     private Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
+    private ProxyManager proxyManager;
+
     private final BeanDefinitionRegistry registry;
 
     public BeanFactory(BeanDefinitionRegistry registry) {
+        //todo 这里其实因为proxy里要用到getBean方法,还不得不额外提供了一个放入单例池的公开方法，但是我感觉这样设计组合似乎不太好
+        proxyManager = new ProxyManager(this);
         this.registry = registry;
         //这里还需要注册一些processor但是我懒得写了
     }
 
+
+    public void putIntoSingletonObjects(String name,Object proxy)
+    {
+        singletonObjects.put(name,proxy);
+    }
+
+    /**
+     * 把bdh拆开然后放到自己的map里
+     * @param bdh
+     */
     public void registerBeanDefinition(BeanDefinitionHolder bdh) {
         beanDefinitionMap.put(bdh.getBeanName(), bdh.getBeanDefinition());
     }
 
 
+    /**
+     * 把所有的BeanDefinition给实例化
+     * 这里我名字和下面的部分结构是仿照Spring源码起名的
+     */
     public void preInstantiateSingletons() {
-        //挨个实例化
+        //是单例且非懒加载的，都挨个实例化
         beanDefinitionMap.forEach((name, beanDefinition) ->
         {
             if (beanDefinition.isSingleton() && beanDefinition.notLazy()) {
+                //spring万恶的getBean加载方法
                 getBean(beanDefinition);
             }
 
@@ -236,28 +256,8 @@ public class BeanFactory {
 
 
     /**
-     * 这里的任务就是从配置类里解析一堆bean然后变成BeanDefinition
-     *
-     * @param configBean
-     */
-    @SneakyThrows
-    private void parserConfig(BeanDefinition configBean) {
-        Class beanClass = configBean.getBeanClass();
-
-        List<Method> beans = new ArrayList<>();
-        // 遍历所有方法，通过注解找出来有bean的方法
-        for (Method method : beanClass.getDeclaredMethods()) {
-
-            if (method.isAnnotationPresent(Bean.class)) {
-                beans.add(method);
-            }
-        }
-
-        registry.registBean(beans,getBean(configBean));
-
-    }
-
-    /**
+     * 可以理解为刷新配置文件，读取所有的类
+     * （但是这里似乎不支持二次刷新，我还没试过）
      * 从配置类里面获取到Bean
      * 这里是完善所有bean的注册内容
      */
@@ -266,123 +266,87 @@ public class BeanFactory {
 
         beanDefinitionMap.forEach((name, candidate) ->
         {
+            //选出有Configuration注解的类，进行处理
             if (candidate.getBeanClass().isAnnotationPresent(Configuration.class)) {
+                //先解析用方法和@Bean配置的Bean
                 parserConfig(candidate);
+                //然后再通过扫描器来找要扫描的包来注册
                 scanComponents(candidate);
             }
         });
     }
 
+    /**
+     * 把配置类里直接配置的Bean给解析出来，变为BeanDefinition去注册
+     * @param configBean
+     */
+    @SneakyThrows
+    private void parserConfig(BeanDefinition configBean) {
+
+        //拿到类本体
+        Class beanClass = configBean.getBeanClass();
+
+        List<Method> beans = new ArrayList<>();
+
+        // 遍历所有方法，通过注解找出来有bean的方法
+        for (Method method : beanClass.getDeclaredMethods()) {
+
+            if (method.isAnnotationPresent(Bean.class)) {
+                beans.add(method);
+            }
+        }
+
+        //交给IoC容器去注册这些内容，转化为BeanDefinition
+        registry.registBean(beans,getBean(configBean));
+
+    }
+
+    /**
+     * 把想通过注解注册的Bean找出来，整成BeanDefinition然后注册
+     * @param config
+     */
     public void scanComponents(BeanDefinition config) {
+        //获取配置类本体
         Class beanClass = config.getBeanClass();
+        //寻找是否有Scan解析标签
         boolean canScan = beanClass.isAnnotationPresent(ComponentScan.class);
+        //开始扫描解析
+        //todo 这里暂时懒得去实现ComponentScans这种复合功能
         if (canScan) {
+            //获取标签
             ComponentScan componentScan = (ComponentScan) beanClass.getAnnotation(ComponentScan.class);
+            //扫描到标签里的包路径
             String[] basePackages = componentScan.value();
             if (basePackages.length < 1) {
                 //如果是空的，就默认包是当前的
                 basePackages = new String[]{beanClass.getPackageName()};
             }
+            //让IoC Context来做扫描，其实就是调用扫描器
             this.registry.scan(basePackages);
         }
 
     }
 
 
-
+    /**
+     * 读取切面配置文件，提前生成代理对象，我有点记不得Spring是不是这个顺序了
+     */
     public void getProxy()
     {
         beanDefinitionMap.values().forEach(bd->
         {
             if(bd.getBeanClass().isAnnotationPresent(Aspect.class))
             {
-                doProxy(bd);
+                proxyManager.doProxy(bd);
             }
         });
     }
 
-    private void doProxy(BeanDefinition beanDefinition)
-    {
-        AopConfig aopConfig = new AopConfig();
 
-        aopConfig.setEntity(getBean(beanDefinition));
-
-        for (Method method : beanDefinition.getBeanClass().getDeclaredMethods()) {
-
-            //todo 所以这里只能处理这种残疾的写法,后面的方法都只能套在pointcut上面
-
-            if(method.isAnnotationPresent(Pointcut.class))
-            {
-                Pointcut p = method.getAnnotation(Pointcut.class);
-                String el = p.value();
-                List<Class> classes = AspectJUtils.parseAspectEL(el);
-                aopConfig.setAopClassess(classes);
-                continue;
-            }
-            if(method.isAnnotationPresent(Before.class))
-            {
-                aopConfig.setBeforeMethod(method);
-                continue;
-            }
-            if(method.isAnnotationPresent(After.class))
-            {
-                aopConfig.setAfterMethod(method);
-                continue;
-            }
-            if(method.isAnnotationPresent(Around.class))
-            {
-                aopConfig.setAroundMethod(method);
-                continue;
-            }
-            if(method.isAnnotationPresent(AfterReturning.class))
-            {
-                AfterReturning tag = method.getAnnotation(AfterReturning.class);
-                aopConfig.setResultName(tag.returning());
-                aopConfig.setAfterReturningMethod(method);
-                continue;
-            }
-            if(method.isAnnotationPresent(AfterThrowing.class))
-            {
-                AfterThrowing tag = method.getAnnotation(AfterThrowing.class);
-                aopConfig.setExceptionName(tag.throwing());
-                aopConfig.setAfterThrowingMethod(method);
-                continue;
-            }
-
-
-
-        }
-
-        createProxy(aopConfig);
-
-    }
-
-    private void createProxy(AopConfig aopConfig)
-    {
-        //TODO 暂时在处理名字上有困难，默认用类名，查找还需要改进
-
-        //TODO 循环依赖的问题还没有解决，导致会拿到原生对象
-
-        aopConfig.getAopClassess().forEach(cls->{
-            Object bean = getBean(beanDefinitionMap.get(cls.getName()));
-
-            Enhancer enhancer = new Enhancer();
-            enhancer.setSuperclass(bean.getClass());
-            enhancer.setCallback(new AopMethodIntercreptor(bean,aopConfig));
-
-            Object proxy = enhancer.create();
-            //todo 由于 Cglib 本身的设计，无法实现在 Proxy 外面再包装一层 Proxy（JDK Proxy 可以），
-            // 通常会报如下错误：
-            // Duplicate method name "newInstance" with signature
-            // 具体 ： https://www.jianshu.com/p/9ba77d8f200b
-            // 个人暂时还没有能力解决这个问题
-
-
-            singletonObjects.put(cls.getName(),proxy);
-        });
-
-    }
-
+    /**
+     * 按照Order标签对BeanDefinition进行排序
+     * 默认是最低优先级,值越小优先级越高
+     */
     public void sortBeanDefinition()
     {
 

@@ -61,11 +61,11 @@ m
 =src/main/java/com/imlehr/summer/annotation/aspect/Before.java,b/d/bd2eef9134723a0075251803c6c3403dcb203af1
 l
 <src/main/java/com/imlehr/summer/annotation/aspect/After.java,9/0/90692c6eb78f5cbedcb3a3ebb8c91b69ce46780f
-g
-7src/main/java/com/imlehr/summer/utils/AspectJUtils.java,9/5/951b226b01017d313c09600723903a1d16079e43
-d
-4src/main/java/com/imlehr/summer/beans/AopConfig.java,7/a/7aa20a021add183a6d36a280709caa8a787a9ada
 j
 :src/main/java/com/imlehr/summer/test/scanner/MyAspect.java,8/7/87b5439199a777a94bf0c8babcea60c2578bc706
 r
 Bsrc/main/java/com/imlehr/summer/context/AopMethodIntercreptor.java,c/7/c73b0f2dcc635e7850633a48ebe6b47bc91a931a
+g
+7src/main/java/com/imlehr/summer/annotation/Ordered.java,0/6/06b94429e663c3711368570c61c7443a9e558c8c
+e
+5src/main/java/com/imlehr/summer/annotation/Order.java,c/4/c449cdace6e42dccc88c2588c2b605517ff0f374

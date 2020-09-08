@@ -1,4 +1,7 @@
 
+zsquid:S1171"YMove the contents of this initializer to a standard constructor or to field initializers.(ÒÌâ–øÿÿÿÿ8Ğö¡Ñ.
 S
 squid:S106"9Replace this use of System.out or System.err by a logger.(Â•Ïo8Ğö¡Ñ.
-zsquid:S1171"YMove the contents of this initializer to a standard constructor or to field initializers.(ÒÌâ–øÿÿÿÿ8Ğö¡Ñ.
+T
+squid:S106"9Replace this use of System.out or System.err by a logger.(õó©8’‚ùšŸ.
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(˜µÑ„8’‚ùšŸ.

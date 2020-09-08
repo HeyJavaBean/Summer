@@ -1,10 +1,12 @@
 package com.imlehr.summer.context.component;
 
+import com.beust.jcommander.internal.Lists;
 import com.imlehr.summer.annotation.scan.Component;
 import com.imlehr.summer.annotation.scan.Controller;
 import com.imlehr.summer.annotation.scan.Repository;
 import com.imlehr.summer.annotation.scan.Service;
 import com.imlehr.summer.beans.definition.BeanDefinitionRegistry;
+import com.imlehr.summer.utils.LoadingUtils;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -27,22 +29,38 @@ public class ClassPathBeanDefinitionScanner {
         //这里还需要注册一些processor但是我懒得写了
     }
 
+    /**
+     * 扫描特定路径下的包，解析相应的BeanDefinition
+     * @param basePackages
+     */
     public void scan(String... basePackages) {
         for (String basePackage : basePackages) {
+            //具体动作
             doScan(basePackage);
         }
     }
 
+    /**
+     * 具体扫描某个路径下的包，解析相应的BeanDefinition
+     * 这个是我自己设计实现的，没太看Spring源码是怎么做的
+     * @param basePackage
+     */
     @SneakyThrows
     private void doScan(String basePackage) {
-        //todo:这里通过ClassPath的方法去扫描加载这些类？目前就只能这个样子咯？反正类加载器先用默认的
 
-        String basePackageUrl = classPath + File.separator + basePackage.replace(".", File.separator);
+        //递归获取当前包下的所有类
+        List<Class> packageClasses = LoadingUtils.recrusivePackage(basePackage);
+        List<Class> componentClasses = Lists.newArrayList();
+        packageClasses.forEach(c->
+        {
+            //提取有特定标签的
+            if(hasTag(c))
+            {
+                componentClasses.add(c);
+            }
+        });
 
-        List componentClasses = new ArrayList<Class>();
-
-        recrusiveScan(new File(basePackageUrl), componentClasses);
-
+        //然后再拿去给register注册
         Class[] classes = new Class[componentClasses.size()];
         componentClasses.toArray(classes);
         registry.register(classes);
@@ -50,6 +68,11 @@ public class ClassPathBeanDefinitionScanner {
 
     }
 
+    /**
+     * 递归找文件，然后用类加载器解析而已
+     * @param f
+     * @param componentClasses
+     */
     @SneakyThrows
     private void recrusiveScan(File f, List componentClasses) {
         for (File file : f.listFiles()) {
@@ -62,6 +85,7 @@ public class ClassPathBeanDefinitionScanner {
                     String substring = absolutePath.substring(classPath.length() + 1, absolutePath.length() - 6);
                     String packageName = substring.replace(File.separator, ".");
                     Class<?> target = Class.forName(packageName);
+                    //找到有特定注解的才能拿去
                     if (hasTag(target)) {
                         componentClasses.add(target);
                     }
@@ -71,6 +95,11 @@ public class ClassPathBeanDefinitionScanner {
     }
 
 
+    /**
+     * 检查自动注册的目标是否具有标签
+     * @param clazz
+     * @return
+     */
     private boolean hasTag(Class clazz) {
         return clazz.isAnnotationPresent(Component.class) || clazz.isAnnotationPresent(Service.class) || clazz.isAnnotationPresent(Repository.class) || clazz.isAnnotationPresent(Controller.class);
     }

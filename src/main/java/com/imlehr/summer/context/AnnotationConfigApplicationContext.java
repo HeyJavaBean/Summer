@@ -24,26 +24,70 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     private BeanFactory beanFactory;
 
 
+    /**
+     * 构造方法，传入一个config，然后就直接生成相应的内容了
+     */
+    public AnnotationConfigApplicationContext(Class... componentClasses)
+    {
+        //初始化组件
+        this();
+        //注册配置信息，执行后，BeanFactory里只有注册类的BeanDefinition
+        register(componentClasses);
+        //刷新，启动容器！
+        refresh();
+    }
+
+    /**
+     * 让reader去通过读取Class的方式注册BeanDefinition
+     */
+    @Override
+    public void register(Class... componentClasses) {
+        //用reader来读取BeanDefinition
+        reader.register(componentClasses);
+    }
+
+    /**
+     * 暂时不考虑线程安全和异常情况
+     * 不支持扩展功能
+     * 在加载好了之前的配置之后
+     * 驱动整个IoC容器启动
+     */
+    public void refresh() {
+
+        //先对BeanDefinition进行排序，就是之前注册的Order信息
+        //todo: 不过我记不得这个步骤是我自己设计的还是源码也这样的，按理说后面还需要排一次顺序
+        beanFactory.sortBeanDefinition();
+
+        //出于设计需求，这里就先把config给实例化了，因为我后面都需要用到这个config实例
+        //todo: 这里可能会遇到config的循环依赖问题，先跳过这个问题，不考虑这个
+        beanFactory.preInit();
+
+        //这里是用来把配置类里的所有内容提取出来用，包括扫描的东西，全部变成BeanDefinition
+        beanFactory.refresh();
+
+        //再次排序，现在这里面就有我们所有想要的类的BeanDefinition而且排好顺序了
+        beanFactory.sortBeanDefinition();
+
+        //然后再把aop的配置给弄了，提前生成好代理Bean对象
+        beanFactory.getProxy();
+
+        //彻底把所有的bean definition给bean化了
+        // Instantiate all remaining (non-lazy-init) singletons.
+        beanFactory.preInstantiateSingletons();
+
+    }
 
 
     /**
-     * 准备reader，然后我自己设计的这里是准备BeanFactory
+     * 初始化各个组件，然后准备一个我自己的BeanFactory
      */
     public AnnotationConfigApplicationContext() {
         // 给定目标，读入组件
         reader = new AnnotatedBeanDefinitionReader(this);
         // 对目标包进行扫描用的
         scanner = new ClassPathBeanDefinitionScanner(this);
-        //todo 初始化设置
+        //Bean工厂初始化
         beanFactory = new BeanFactory(this);
-    }
-
-    /**
-     * 让reader去注册他
-     */
-    @Override
-    public void register(Class... componentClasses) {
-        this.reader.register(componentClasses);
     }
 
     @Override
@@ -53,36 +97,13 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     }
 
     /**
-     * 使用扫描器进行扫描，这里我就先自己设计了
+     * 使用扫描器进行扫描，把对应路径下的类变成BeanDefinition
+     * 这里我就先自己设计了，和源码的可能意思不太一样
      * @param basePackages
      */
     @Override
     public void scan(String... basePackages) {
         scanner.scan(basePackages);
-    }
-
-    /**
-     * 暂时不考虑线程安全和异常情况
-     * 不支持扩展功能
-     */
-    public void refresh() {
-
-
-        beanFactory.sortBeanDefinition();
-        //出于设计需求，这里就先把config给实例化了，这里可能会遇到config的循环依赖问题，先跳过这个问题咱们
-        beanFactory.preInit();
-
-        //这里是用来把配置类里的所有内容提取出来用，包括扫描的东西
-        beanFactory.refresh();
-
-        beanFactory.sortBeanDefinition();
-        //然后再把aop的配置给弄了，提前生成好代理对象
-        beanFactory.getProxy();
-
-        //彻底把所有的bean definition给bean化了
-        // Instantiate all remaining (non-lazy-init) singletons.
-        beanFactory.preInstantiateSingletons();
-
     }
 
     @Override
@@ -109,20 +130,14 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
     }
 
 
-
     /**
-     * 这里目前是只支持传入一个类，以后再来扩展
-     * component
+     * 把在Config里以方法形式配置的Bean给注册为BeanDefinition
+     * @param beans
+     * @param configBean
      */
-    public AnnotationConfigApplicationContext(Class... componentClasses)
-    {
-        this();
-        register(componentClasses);
-        refresh();
-    }
-
     @Override
     public void registBean(List<Method> beans,Object configBean) {
+        //这个任务还是reader来做，读取内容并生成BeanDefinition
         reader.registBeanAnotation(beans,configBean);
     }
 }

@@ -1,9 +1,9 @@
-package com.imlehr.summer.beans;
+package com.imlehr.summer.aop.beans;
 
-import lombok.Data;
+import com.imlehr.summer.aop.beans.AopConfig;
+import com.imlehr.summer.aop.beans.JointPoint;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 @Getter
 @Setter
 @Accessors(chain = true )
-public class ProceedingJointPoint  extends JointPoint{
+public class ProceedingJointPoint  extends JointPoint {
 
     private Method coreMethod;
 
