@@ -9,7 +9,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/SummerCore" />
             <option value="$PROJECT_DIR$/SummerMVC" />
+            <option value="$PROJECT_DIR$/SummerTest" />
           </set>
         </option>
       </GradleProjectSettings>

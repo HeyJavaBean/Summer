@@ -8,14 +8,17 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.2/524e0a697e9d62950b2f763d88d35cd8dc82a9a1/lombok-1.18.2.jar" />
         </processorPath>
+        <module name="Summer.SummerMVC.test" />
+        <module name="Summer.SummerCore.test" />
+        <module name="Summer.SummerTest.test" />
+        <module name="Summer.SummerTest.main" />
         <module name="Summer.test" />
+        <module name="Summer.SummerCore.main" />
+        <module name="Summer.SummerMVC.main" />
         <module name="Summer.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8">
-      <module name="Summer.SummerMVC.main" target="11" />
-      <module name="Summer.SummerMVC.test" target="11" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="11" />
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

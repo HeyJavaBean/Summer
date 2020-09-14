@@ -1,3 +1,5 @@
 rootProject.name = 'Summer'
 include 'SummerMVC'
+include 'SummerCore'
+include 'SummerTest'
 
