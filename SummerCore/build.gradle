@@ -1,6 +1,7 @@
 dependencies {
-    //cglib
-    compile group: 'cglib', name: 'cglib', version: '3.3.0'
+    //cglib  todo  之前是3.3.0,但是web模块会莫名导致cglib enhancer exceptionInitializerError的问题
+    compile group: 'cglib', name: 'cglib', version: '3.1'
+
 
     //ASM 获取方法参数名用的
     compile group: 'com.github.houbb', name: 'asm-tool', version: '0.0.3'

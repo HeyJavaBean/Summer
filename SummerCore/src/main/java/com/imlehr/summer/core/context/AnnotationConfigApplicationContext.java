@@ -71,9 +71,8 @@ public class AnnotationConfigApplicationContext implements ApplicationContext, B
         //再次排序，现在这里面就有我们所有想要的类的BeanDefinition而且排好顺序了
         beanFactory.sortBeanDefinition();
 
-        //然后再把aop的配置给弄了，提前生成好代理Bean对象
-        //fixme 为了先测试mvc所以先不代理 不然这里迷之出错
-        //beanFactory.getProxy();
+        //这里现在变成了配置扫描
+        beanFactory.getProxy();
 
         //彻底把所有的bean definition给bean化了
         // Instantiate all remaining (non-lazy-init) singletons.

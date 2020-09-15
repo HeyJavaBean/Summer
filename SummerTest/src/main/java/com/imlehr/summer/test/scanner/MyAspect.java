@@ -17,7 +17,7 @@ public class MyAspect {
     /**
      * 只是用来申明切点
      */
-    @Pointcut("within(com.imlehr.summer.test.scanner.component.MyComponent)")
+    @Pointcut("within(com.imlehr.summer.test.scanner..)")
     public void pointCut(){};
 
 

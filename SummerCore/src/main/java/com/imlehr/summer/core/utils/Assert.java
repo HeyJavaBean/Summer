@@ -16,6 +16,8 @@
 
 package com.imlehr.summer.core.utils;
 
+import java.util.List;
+
 /**
  * 仿照Spring的Assert工具类写的
  * todo 但是我不知道为什么源码要把这里设计为抽象类
@@ -27,6 +29,11 @@ public abstract class Assert {
 		if (array.length==0) {
 			throw new IllegalArgumentException(message);
 		}
+	}
+
+	public static boolean NotEmpty(List list)
+	{
+		return (list!=null && !list.isEmpty());
 	}
 
 }

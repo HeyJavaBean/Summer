@@ -2,6 +2,7 @@ package com.imlehr.summer.core.aop;
 
 import com.imlehr.summer.core.annotation.aspect.*;
 import com.imlehr.summer.core.aop.beans.AopConfig;
+import com.imlehr.summer.core.beans.BeanWrapper;
 import com.imlehr.summer.core.beans.definition.BeanDefinition;
 import com.imlehr.summer.core.beans.factory.BeanFactory;
 import net.sf.cglib.proxy.Enhancer;
@@ -24,7 +25,7 @@ public class ProxyManager {
     }
 
     /**
-     * 读取某个Aspect切面配置文件，然后开始生成代理对象
+     * 读取某个Aspect切面配置文件，然后开始给BeanDefinition打标记而不是先实例化对象
      * 这里采用的是CGLib的方法
      * @param beanDefinition
      */
@@ -90,46 +91,46 @@ public class ProxyManager {
 
         }
 
-        //生成代理对象
-        createProxy(aopConfig);
-
+        aopConfig.getAopClassess().forEach(cls->{
+            BeanDefinition bd = beanFactory.getBeanDefinition(cls.getName());
+            bd.setNeedProxy(true);
+            bd.setAopConfig(aopConfig);
+        });
+        
     }
 
 
     /**
-     * 之前已经在AopConfig里录入了Aspect里配置的信息
-     * 所以接下来就是用CGLIB来生成代理对象然后放入到对象池里去了
-     * @param aopConfig
+     * 这个方法则变成了直接实例化对象了
      */
-    private void createProxy(AopConfig aopConfig)
+    public Object createProxy(Object bean,BeanDefinition beanDefinition)
     {
         //TODO 暂时在处理名字上有困难，默认用类名，查找还需要改进
 
         //TODO 循环依赖的问题还没有解决，导致会拿到原生对象
+        //拿到Bean（如果没有的话就自动创建）
 
-        aopConfig.getAopClassess().forEach(cls->{
+        AopConfig aopConfig = beanDefinition.getAopConfig();
 
-            //拿到Bean（如果没有的话就自动创建）
-            Object bean = beanFactory.getBean(beanFactory.getBeanDefinition(cls.getName()));
+        //CGLib开始搞
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(bean.getClass());
+        enhancer.setCallback(new AopMethodIntercreptor(bean,aopConfig));
 
-            //CGLib开始搞
-            Enhancer enhancer = new Enhancer();
-            enhancer.setSuperclass(bean.getClass());
-            enhancer.setCallback(new AopMethodIntercreptor(bean,aopConfig));
+        //获取到代理对象
+        Object proxy = enhancer.create();
+        //todo 由于 Cglib 本身的设计，无法实现在 Proxy 外面再包装一层 Proxy
+        // 所以暂时没法实现多切面运行顺序
+        // 通常会报如下错误：
+        // Duplicate method name "newInstance" with signature
+        // 具体 ： https://www.jianshu.com/p/9ba77d8f200b
+        // 个人暂时还没有能力解决这个问题
 
-            //获取到代理对象
-            Object proxy = enhancer.create();
-            //todo 由于 Cglib 本身的设计，无法实现在 Proxy 外面再包装一层 Proxy
-            // 所以暂时没法实现多切面运行顺序
-            // 通常会报如下错误：
-            // Duplicate method name "newInstance" with signature
-            // 具体 ： https://www.jianshu.com/p/9ba77d8f200b
-            // 个人暂时还没有能力解决这个问题
-
-            //放到单例池里去
-            beanFactory.putIntoSingletonObjects(cls.getName(),proxy);
-        });
+        return proxy;
 
     }
+
+
+
 
 }

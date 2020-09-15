@@ -3,17 +3,21 @@ package com.imlehr.summer.core.beans.factory;
 import com.imlehr.summer.core.annotation.Bean;
 import com.imlehr.summer.core.annotation.ComponentScan;
 import com.imlehr.summer.core.annotation.Configuration;
-import com.imlehr.summer.core.annotation.aspect.*;
+import com.imlehr.summer.core.annotation.aspect.Aspect;
 import com.imlehr.summer.core.aop.ProxyManager;
+import com.imlehr.summer.core.beans.BeanWrapper;
 import com.imlehr.summer.core.beans.definition.BeanDefinition;
 import com.imlehr.summer.core.beans.definition.BeanDefinitionHolder;
-import com.imlehr.summer.core.beans.object.ObjectFactory;
 import com.imlehr.summer.core.beans.definition.BeanDefinitionRegistry;
+import com.imlehr.summer.core.beans.object.ObjectFactory;
 import lombok.SneakyThrows;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.imlehr.summer.core.utils.Assert.NotEmpty;
 
 /**
  * @author Lehr
@@ -81,13 +85,12 @@ public class BeanFactory {
     private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
     /**
-     * 三级缓存 存放 bean 工厂对象，用于解决循环依赖
+     * 三级缓存 存放 bean 工厂对象，用于解决AOP的情况
      */
     private final Map<String, ObjectFactory> singletonFactories = new HashMap<>(16);
 
-
     /**
-     * new完了但是还没有填写信息的情况
+     * 用来记录当前正在实例化的对象
      */
     private final Set<String> singletonsCurrentlyInCreation =
             Collections.newSetFromMap(new ConcurrentHashMap<>(16));
@@ -114,10 +117,10 @@ public class BeanFactory {
 
         //如果说是获取到了（但是有可能是个半成品）
         if (sharedInstance != null) {
-            //使用某个方法完善实例化?
+            //todo 使用某个方法完善实例化?
 
         } else {
-            //开始实例化
+            //开始实例化，这里会去记录状态，然后可能会导致连锁递归调用的情况
             singletonsCurrentlyInCreation.add(beanName);
             sharedInstance = doCreateBean(beanDefinition);
             singletonObjects.put(beanName,sharedInstance);
@@ -127,56 +130,79 @@ public class BeanFactory {
         return sharedInstance;
     }
 
-    private Object createBeanInstance(BeanDefinition beanDefinition)
+
+    private Object doCreateBean(BeanDefinition beanDefinition) {
+
+        //创建对象，准备工厂然后放入缓存里，同时准备好原生对象
+        BeanWrapper instanceWrapper = createBeanInstance(beanDefinition);
+
+        //注入属性
+        populateBean(beanDefinition,instanceWrapper);
+
+        Object realBean;
+        if(instanceWrapper.getBeanEntity()==singletonObjects.get(beanDefinition.getBeanName())||singletonObjects.get(beanDefinition.getBeanName())==null)
+        {
+            //安全的情况，单个
+            realBean = instanceWrapper.getFactory().getObject();
+
+        }else
+        {
+            //生成了代理的情况
+            realBean=singletonObjects.get(beanDefinition.getBeanName());
+        }
+
+        instanceWrapper.setBeanEntity(realBean);
+
+        //注入属性
+        instanceWrapper.flush();
+
+
+        initializeBean(instanceWrapper);
+
+        //写的简略一点，创建代理对象实际上是应该在这里来完成的
+
+        return instanceWrapper.getBeanEntity();
+    }
+
+    private BeanWrapper createBeanInstance(BeanDefinition beanDefinition)
     {
-        //new出对象
-        ObjectFactory objectFactory = ObjectFactory.getFactory(beanDefinition);
+        BeanWrapper instanceWrapper = new BeanWrapper().setBeanDefinition(beanDefinition);
+
+        //似乎是先不慌new出对象
+        ObjectFactory objectFactory = ObjectFactory.getFactory(beanDefinition,proxyManager);
+
+        instanceWrapper.setFactory(objectFactory);
+
+        //生成原始对象
+        Object bean = objectFactory.getOrigin();
+
         //放入到三级缓存里去
         singletonFactories.put(beanDefinition.getBeanName(), objectFactory);
-        Object bean = objectFactory.getObject();
-        return bean;
+
+        instanceWrapper.setBeanEntity(bean);
+
+        return instanceWrapper;
     }
 
 
-    private void populateBean(BeanDefinition beanDefinition,Object bean)
+    private void populateBean(BeanDefinition beanDefinition,BeanWrapper instanceWrapper)
     {
-        List<Field> autowireList = beanDefinition.getAutowireList();
-        if(autowireList!=null && !autowireList.isEmpty())
+        List<Field> autowires = beanDefinition.getAutowireList();
+
+        if(NotEmpty(autowires))
         {
-            autowireList.forEach(ab->
+            autowires.forEach(ab->
             {
                 beanDefinitionMap.values().forEach(bd->
                 {
                     if(bd.getBeanClass().equals(ab.getType()))
                     {
-                        Object field = getBean(bd);
-                        try {
-                            ab.setAccessible(true);
-                            ab.set(bean,field);
-                        } catch (IllegalAccessException e) {
-                            System.out.println("属性注入出错了我靠");
-                            e.printStackTrace();
-                        }
+                        Object fieldValue = getBean(bd);
+                        instanceWrapper.getFieldMap().put(ab,fieldValue);
                     }
                 });
             });
         }
-    }
-
-    private Object doCreateBean(BeanDefinition beanDefinition) {
-
-        //创建对象
-        Object instanceWrapper = createBeanInstance(beanDefinition);
-
-        //注入属性
-        populateBean(beanDefinition,instanceWrapper);
-
-        //似乎是在这里做AOP
-        initializeBean(instanceWrapper);
-
-        //写的简略一点，创建代理对象实际上是应该在这里来完成的
-
-        return instanceWrapper;
     }
 
 
@@ -187,8 +213,8 @@ public class BeanFactory {
 
 
     public Object createProto(BeanDefinition beanDefinition)
-    {clear
-        ObjectFactory objectFactory = ObjectFactory.getFactory(beanDefinition);
+    {
+        ObjectFactory objectFactory = ObjectFactory.getFactory(beanDefinition,proxyManager);
 
         Object bean = objectFactory.getObject();
         List<Field> autowireList = beanDefinition.getAutowireList();

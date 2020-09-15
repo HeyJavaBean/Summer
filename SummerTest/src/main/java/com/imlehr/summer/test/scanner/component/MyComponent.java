@@ -9,7 +9,7 @@ public class MyComponent{
 
 
     @Autowired
-    private MyService service;
+    public MyService service;
     {
         System.out.println("Hey I'm the component");
     }

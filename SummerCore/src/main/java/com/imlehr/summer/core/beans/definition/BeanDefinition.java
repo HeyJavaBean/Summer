@@ -1,6 +1,7 @@
 package com.imlehr.summer.core.beans.definition;
 
 import com.imlehr.summer.core.annotation.Ordered;
+import com.imlehr.summer.core.aop.beans.AopConfig;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -56,6 +57,10 @@ public class BeanDefinition {
     {
         return null;
     }
+
+    private boolean needProxy = false;
+
+    private AopConfig aopConfig;
 
 
 

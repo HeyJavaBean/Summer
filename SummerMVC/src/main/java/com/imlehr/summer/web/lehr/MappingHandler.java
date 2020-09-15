@@ -64,6 +64,7 @@ public class MappingHandler {
         }
         Method[] methods = clazz.getMethods();
 
+        //fixme 这里似乎和aop有点问题，每次我检查一个方法的时候aop切面都会走一次？？？
 
         for (Method m : methods) {
 
@@ -108,6 +109,9 @@ public class MappingHandler {
 
     private HandlerConfig handleMethod(Method m)
     {
+
+        //fixme  代理对象会把之前标签的对象给吃掉，这nm怎么玩啊
+
         if(m.isAnnotationPresent(RequestMapping.class))
         {
             RequestMapping annotation = m.getAnnotation(RequestMapping.class);
@@ -151,7 +155,7 @@ public class MappingHandler {
 
 
         //todo 现在暂时不接受传参
-        Object invoke = method.invoke(handlerConfig.getBean(), null);
+        Object invoke = method.invoke(handlerConfig.getBean());
 
         //todo 目前不支持返回对象
         response.getWriter().write(invoke.toString());
