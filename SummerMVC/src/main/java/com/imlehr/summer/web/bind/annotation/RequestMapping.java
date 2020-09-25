@@ -24,6 +24,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Inherited //如果不加上这个，则aop的时候会失效的
 public @interface RequestMapping {
 
 	String name() default "";

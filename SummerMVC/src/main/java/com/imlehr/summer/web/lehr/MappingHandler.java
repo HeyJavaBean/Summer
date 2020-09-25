@@ -48,14 +48,13 @@ public class MappingHandler {
             if(clazz.isAnnotationPresent(Controller.class)|| clazz.isAnnotationPresent(RestController.class))
             {
                 Object bean = webApplicationContext.getBean(name);
-                doMapping(bean);
+                doMapping(bean,clazz);
             }
         });
     }
 
-    private void doMapping(Object bean)
+    private void doMapping(Object bean,Class clazz)
     {
-        Class clazz = bean.getClass();
         String classMapping = "";
         if(clazz.isAnnotationPresent(RequestMapping.class))
         {
